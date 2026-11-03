@@ -1,7 +1,10 @@
-import { ChevronDown } from "lucide-react";
+"use client";
+
+import { motion } from "framer-motion";
+import { ChevronDown, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// Select dropdown with label, helper text, error state, and optional left icon
+// Select dropdown with label, helper text, shake error, and optional left icon
 export function Select({
   label,
   helperText,
@@ -29,7 +32,7 @@ export function Select({
       {/* Select container */}
       <div className="relative flex items-center">
         {LeftIcon && (
-          <div className="pointer-events-none absolute left-3 flex items-center justify-center text-slate-400">
+          <div className="pointer-events-none absolute left-3.5 flex items-center justify-center text-slate-400">
             <LeftIcon className="h-4 w-4" />
           </div>
         )}
@@ -38,7 +41,7 @@ export function Select({
           id={id}
           disabled={disabled}
           className={cn(
-            "w-full appearance-none rounded-xl border border-slate-200 bg-white px-3.5 py-2 pr-10 text-sm text-slate-900 shadow-xs transition-colors cursor-pointer",
+            "w-full min-h-[44px] appearance-none rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 pr-10 text-sm text-slate-900 shadow-xs transition-colors cursor-pointer",
             "focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20",
             "disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed",
             "dark:border-slate-800 dark:bg-[#131A2E] dark:text-slate-100 dark:disabled:bg-slate-900",
@@ -57,14 +60,22 @@ export function Select({
         </select>
 
         {/* Chevron icon */}
-        <div className="pointer-events-none absolute right-3 flex items-center text-slate-400">
+        <div className="pointer-events-none absolute right-3.5 flex items-center text-slate-400">
           <ChevronDown className="h-4 w-4" />
         </div>
       </div>
 
-      {/* Error or Helper text */}
+      {/* Animated Error with AlertCircle */}
       {error ? (
-        <p className="text-xs text-rose-500 dark:text-rose-400">{error}</p>
+        <motion.p
+          initial={{ opacity: 0, x: -4 }}
+          animate={{ opacity: 1, x: [0, -3, 3, -3, 2, 0] }}
+          transition={{ duration: 0.3 }}
+          className="text-xs text-rose-500 dark:text-rose-400 flex items-center gap-1 mt-1 font-medium"
+        >
+          <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+          <span>{error}</span>
+        </motion.p>
       ) : helperText ? (
         <p className="text-xs text-slate-500 dark:text-slate-400">{helperText}</p>
       ) : null}
@@ -73,4 +84,3 @@ export function Select({
 }
 
 export default Select;
-
