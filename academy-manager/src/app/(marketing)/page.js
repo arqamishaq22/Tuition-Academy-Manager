@@ -1,34 +1,61 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/Button";
+import {
+  Navbar,
+  Hero,
+  TrustedStrip,
+  Features,
+  HowItWorks,
+  Stats,
+  Pricing,
+  Testimonials,
+  FAQ,
+  FinalCTA,
+  Footer,
+} from "@/components/sections";
 
-// Landing page for Academy Manager
-export default function MarketingPage() {
+export const metadata = {
+  title: "Academy Manager - Run Your Academy Without Paper Registers",
+  description:
+    "Smart management SaaS web application for Pakistani tuition academies, coaching centers, and private tutors. Track attendance, fees in PKR, report cards, and automated WhatsApp parent alerts.",
+};
+
+export default function MarketingLandingPage() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-6 text-center">
-      <div className="max-w-xl space-y-4">
-        <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-          Pakistan Tuition SaaS
-        </span>
-        <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl">
-          Academy Manager Landing Page
-        </h1>
-        <p className="text-sm text-slate-600 dark:text-slate-400">
-          Manage students, classes, attendance, fees, and results for tuition academies and coaching centers in Pakistan.
-        </p>
+    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 dark:bg-[#0B1020] dark:text-slate-100 overflow-x-hidden font-body selection:bg-primary-500 selection:text-white">
+      {/* 1. Sticky Glass Navbar */}
+      <Navbar />
 
-        <div className="flex items-center justify-center gap-3 pt-4">
-          <Link href="/login">
-            <Button variant="outline">Login</Button>
-          </Link>
-          <Link href="/signup">
-            <Button>Sign Up</Button>
-          </Link>
-          <Link href="/dashboard">
-            <Button variant="secondary">Go to Dashboard</Button>
-          </Link>
-        </div>
-      </div>
-    </main>
+      {/* Main Page Flow */}
+      <main className="flex-1">
+        {/* 2. Hero with Animated Gradient Mesh & Floating Preview */}
+        <Hero />
+
+        {/* 3. Trusted Subjects Strip */}
+        <TrustedStrip />
+
+        {/* 4. Core Academy Features Grid */}
+        <Features />
+
+        {/* 5. 3-Step Setup Flow */}
+        <HowItWorks />
+
+        {/* 6. Animated Numerical Stats Strip */}
+        <Stats />
+
+        {/* 7. PKR Pricing with Monthly/Yearly Toggle */}
+        <Pricing />
+
+        {/* 8. Academy Owner Testimonials Carousel */}
+        <Testimonials />
+
+        {/* 9. FAQ Accordion */}
+        <FAQ />
+
+        {/* 10. Final Call To Action */}
+        <FinalCTA />
+      </main>
+
+      {/* 11. Multi-Column Footer */}
+      <Footer />
+    </div>
   );
 }
-
