@@ -217,7 +217,7 @@ export const students = [
     phone: "0302-3344119",
     address: "Samanabad, Lahore",
     monthlyFee: 5000,
-    attendanceRate: 92,
+    attendanceRate: 72,
     feeStatus: "Paid",
     admissionDate: "2026-03-05",
     feeHistory: [
@@ -253,7 +253,7 @@ export const students = [
     phone: "0335-4433221",
     address: "Sabzazar, Lahore",
     monthlyFee: 4500,
-    attendanceRate: 82,
+    attendanceRate: 71,
     feeStatus: "Overdue",
     admissionDate: "2026-04-05",
     feeHistory: [
@@ -469,7 +469,7 @@ export const students = [
     phone: "0316-8899223",
     address: "Bahria Town, Lahore",
     monthlyFee: 6500,
-    attendanceRate: 86,
+    attendanceRate: 68,
     feeStatus: "Overdue",
     admissionDate: "2026-03-04",
     feeHistory: [
