@@ -19,7 +19,10 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "Academy Manager - Tuition & Coaching Center SaaS (Pakistan)",
+  title: {
+    default: "Academy Manager - Tuition & Coaching Center SaaS (Pakistan)",
+    template: "%s | Academy Manager",
+  },
   description:
     "Smart management SaaS web application for Pakistani tuition academies, coaching centers, and home tutors.",
 };

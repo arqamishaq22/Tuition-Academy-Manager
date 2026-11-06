@@ -945,6 +945,9 @@ export default function StudentsPage() {
 
             {/* Slide-out Drawer */}
             <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-label="Student details"
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
@@ -968,6 +971,7 @@ export default function StudentsPage() {
 
                   <button
                     onClick={() => setSelectedStudentDetail(null)}
+                    aria-label="Close student details"
                     className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 cursor-pointer"
                   >
                     <X className="h-5 w-5" />

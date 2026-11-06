@@ -1,19 +1,16 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { Sun, Moon } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+const emptySubscribe = () => () => {};
 
 // ThemeToggle with smooth rotate and fade icon swap
 export function ThemeToggle({ className }) {
   const { theme, setTheme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  // Avoid hydration mismatch by waiting until mounted
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
 
   if (!mounted) {
     return (

@@ -12,21 +12,21 @@ export default function DashboardLayout({ children }) {
   const pathname = usePathname();
 
   // Desktop sidebar collapse state (persisted in localStorage)
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem("academy_sidebar_collapsed");
+        if (stored !== null) {
+          return JSON.parse(stored);
+        }
+      } catch {
+        // Ignore localStorage errors
+      }
+    }
+    return false;
+  });
   // Mobile drawer open state
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
-
-  // Restore sidebar collapsed state from localStorage on client mount
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem("academy_sidebar_collapsed");
-      if (stored !== null) {
-        setIsCollapsed(JSON.parse(stored));
-      }
-    } catch {
-      // Ignore localStorage errors
-    }
-  }, []);
 
   // Toggle collapse and save state
   const handleToggleCollapse = () => {

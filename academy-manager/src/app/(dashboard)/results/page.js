@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useRef, useSyncExternalStore } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Award,
@@ -69,12 +69,11 @@ const GRADE_COLORS = {
   F: "#F43F5E", // Rose 500
 };
 
+const emptySubscribe = () => () => {};
+
 export default function ResultsPage() {
   // Prevent SSR dimension mismatch for Recharts
-  const [isMounted, setIsMounted] = useState(false);
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  const isMounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
 
   // Main Tabs: "exams" | "enter-marks" | "report-cards"
   const [activeTab, setActiveTab] = useState("exams");
@@ -100,13 +99,15 @@ export default function ResultsPage() {
 
   // Tab 2 state: Enter Marks
   const [marksExamId, setMarksExamId] = useState(initialExams[0]?.id || "ex-001");
-  const [tempMarks, setTempMarks] = useState({});
+  const [draftMarks, setDraftMarks] = useState({});
   const [isSavingMarks, setIsSavingMarks] = useState(false);
   const inputRefs = useRef([]);
 
   // Tab 3 state: Report Cards
   const [reportClass, setReportClass] = useState(classes[0]?.name || "");
-  const [reportStudentId, setReportStudentId] = useState("");
+  const [reportStudentId, setReportStudentId] = useState(
+    () => initialStudents.find((s) => s.className === classes[0]?.name)?.id || ""
+  );
   const [teacherRemarks, setTeacherRemarks] = useState(
     "Demonstrates excellent conceptual understanding and analytical problem-solving skills. Recommended for scholarship honors."
   );
@@ -212,7 +213,7 @@ export default function ResultsPage() {
     };
   }, [activeExam, activeExamStudents, marksState]);
 
-  // Tab 2: Initialize / sync tempMarks when marksExamId changes
+  // Tab 2: Compute effective marks combining saved marks and local drafts
   const activeMarksExam = useMemo(() => {
     return examsList.find((e) => e.id === marksExamId) || examsList[0];
   }, [examsList, marksExamId]);
@@ -222,33 +223,46 @@ export default function ResultsPage() {
     return initialStudents.filter((s) => s.className === activeMarksExam.className);
   }, [activeMarksExam]);
 
-  useEffect(() => {
-    if (activeMarksExam) {
-      const existing = marksState[activeMarksExam.id] || {};
-      const initial = {};
-      marksExamStudents.forEach((std) => {
-        initial[std.id] = existing[std.id] !== undefined ? String(existing[std.id]) : "";
-      });
-      setTempMarks(initial);
-    }
-  }, [activeMarksExam, marksExamStudents, marksState]);
+  const effectiveMarks = useMemo(() => {
+    if (!activeMarksExam) return {};
+    const existing = marksState[activeMarksExam.id] || {};
+    const edits = draftMarks[activeMarksExam.id] || {};
+    const result = {};
+    marksExamStudents.forEach((std) => {
+      if (edits[std.id] !== undefined) {
+        result[std.id] = edits[std.id];
+      } else if (existing[std.id] !== undefined) {
+        result[std.id] = String(existing[std.id]);
+      } else {
+        result[std.id] = "";
+      }
+    });
+    return result;
+  }, [activeMarksExam, marksState, draftMarks, marksExamStudents]);
 
   // Tab 2: Count how many marks are entered
   const enteredMarksCount = useMemo(() => {
-    return Object.values(tempMarks).filter((v) => v !== "" && !isNaN(Number(v))).length;
-  }, [tempMarks]);
+    return Object.values(effectiveMarks).filter((v) => v !== "" && !isNaN(Number(v))).length;
+  }, [effectiveMarks]);
 
   // Handle Mark Input Change with 0 to totalMarks validation
   const handleMarkChange = (studentId, val) => {
+    if (!activeMarksExam) return;
     if (val === "") {
-      setTempMarks((prev) => ({ ...prev, [studentId]: "" }));
+      setDraftMarks((prev) => ({
+        ...prev,
+        [activeMarksExam.id]: { ...(prev[activeMarksExam.id] || {}), [studentId]: "" },
+      }));
       return;
     }
     const num = Number(val);
     if (!isNaN(num)) {
       if (num < 0) return;
-      if (activeMarksExam && num > activeMarksExam.totalMarks) return;
-      setTempMarks((prev) => ({ ...prev, [studentId]: String(num) }));
+      if (num > activeMarksExam.totalMarks) return;
+      setDraftMarks((prev) => ({
+        ...prev,
+        [activeMarksExam.id]: { ...(prev[activeMarksExam.id] || {}), [studentId]: String(num) },
+      }));
     }
   };
 
@@ -268,7 +282,7 @@ export default function ResultsPage() {
     setIsSavingMarks(true);
     setTimeout(() => {
       const parsed = {};
-      Object.entries(tempMarks).forEach(([id, val]) => {
+      Object.entries(effectiveMarks).forEach(([id, val]) => {
         if (val !== "" && !isNaN(Number(val))) {
           parsed[id] = Number(val);
         }
@@ -278,6 +292,12 @@ export default function ResultsPage() {
         ...prev,
         [activeMarksExam.id]: parsed,
       }));
+
+      setDraftMarks((prev) => {
+        const next = { ...prev };
+        delete next[activeMarksExam.id];
+        return next;
+      });
 
       // Update exam status to "Published"
       setExamsList((prev) =>
@@ -335,17 +355,11 @@ export default function ResultsPage() {
     return initialStudents.filter((s) => s.className === reportClass);
   }, [reportClass]);
 
-  // Default student selection
-  useEffect(() => {
-    if (reportStudentsInClass.length > 0 && (!reportStudentId || !reportStudentsInClass.find(s => s.id === reportStudentId))) {
-      setReportStudentId(reportStudentsInClass[0].id);
-    }
-  }, [reportStudentsInClass, reportStudentId]);
-
   const activeReportStudent = useMemo(() => {
     return (
       reportStudentsInClass.find((s) => s.id === reportStudentId) ||
-      reportStudentsInClass[0]
+      reportStudentsInClass[0] ||
+      null
     );
   }, [reportStudentsInClass, reportStudentId]);
 
@@ -963,7 +977,7 @@ export default function ResultsPage() {
 
                 <TableBody>
                   {marksExamStudents.map((std, idx) => {
-                    const rawVal = tempMarks[std.id] ?? "";
+                    const rawVal = effectiveMarks[std.id] ?? "";
                     const numVal = Number(rawVal);
                     const hasValue = rawVal !== "" && !isNaN(numVal);
                     const pct = hasValue && activeMarksExam ? Math.round((numVal / activeMarksExam.totalMarks) * 100) : null;
@@ -1037,7 +1051,7 @@ export default function ResultsPage() {
             {/* Mobile View: High-Touch Compact Cards */}
             <div className="block sm:hidden p-4 space-y-3">
               {marksExamStudents.map((std, idx) => {
-                const rawVal = tempMarks[std.id] ?? "";
+                const rawVal = effectiveMarks[std.id] ?? "";
                 const numVal = Number(rawVal);
                 const hasValue = rawVal !== "" && !isNaN(numVal);
                 const pct = hasValue && activeMarksExam ? Math.round((numVal / activeMarksExam.totalMarks) * 100) : null;
@@ -1114,7 +1128,12 @@ export default function ResultsPage() {
                   </label>
                   <select
                     value={reportClass}
-                    onChange={(e) => setReportClass(e.target.value)}
+                    onChange={(e) => {
+                      const newCls = e.target.value;
+                      setReportClass(newCls);
+                      const first = initialStudents.find((s) => s.className === newCls);
+                      setReportStudentId(first ? first.id : "");
+                    }}
                     className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs sm:text-sm font-medium text-slate-900 focus:border-primary-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100 min-h-[44px]"
                   >
                     {classes.map((cls) => (
@@ -1130,7 +1149,7 @@ export default function ResultsPage() {
                     Select Student
                   </label>
                   <select
-                    value={reportStudentId}
+                    value={activeReportStudent?.id || ""}
                     onChange={(e) => setReportStudentId(e.target.value)}
                     className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs sm:text-sm font-medium text-slate-900 focus:border-primary-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100 min-h-[44px]"
                   >

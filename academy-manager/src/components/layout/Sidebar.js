@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   GraduationCap,
@@ -60,6 +60,7 @@ export function Sidebar({
   className,
 }) {
   const pathname = usePathname();
+  const router = useRouter();
 
   return (
     <aside
@@ -196,9 +197,7 @@ export function Sidebar({
             {/* Logout Button */}
             <button
               onClick={() => {
-                if (typeof window !== "undefined") {
-                  window.location.href = "/login";
-                }
+                router.push("/login");
               }}
               className="flex w-full items-center space-x-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
             >
@@ -219,9 +218,7 @@ export function Sidebar({
             {/* Collapsed Logout Icon */}
             <button
               onClick={() => {
-                if (typeof window !== "undefined") {
-                  window.location.href = "/login";
-                }
+                router.push("/login");
               }}
               className="h-8 w-8 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 flex items-center justify-center transition-colors cursor-pointer"
               title="Log Out"

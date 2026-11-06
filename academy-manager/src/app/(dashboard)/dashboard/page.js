@@ -149,6 +149,45 @@ function AnimatedCounter({ end, prefix = "", suffix = "", duration = 1000 }) {
   );
 }
 
+// Time-aware greeting & date calculation helper
+function getGreetingAndDate() {
+  if (typeof window === "undefined") {
+    return { greeting: "Good morning", todayFormatted: "Thursday, 05 Nov 2026" };
+  }
+  const now = new Date();
+  const hour = now.getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+  const todayFormatted = new Intl.DateTimeFormat("en-PK", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(now);
+  return { greeting, todayFormatted };
+}
+
+// Custom Recharts Area Chart Tooltip
+function CustomAreaTooltip({ active, payload, label }) {
+  if (active && payload && payload.length) {
+    return (
+      <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-lg dark:border-slate-800 dark:bg-[#131A2E] text-xs space-y-1">
+        <p className="font-heading font-bold text-slate-800 dark:text-slate-100">
+          {label} 2026
+        </p>
+        <p className="text-primary-600 dark:text-primary-400 font-semibold">
+          Collected: Rs. {new Intl.NumberFormat("en-PK").format(payload[0].value)}
+        </p>
+        {payload[1] && (
+          <p className="text-slate-400">
+            Target: Rs. {new Intl.NumberFormat("en-PK").format(payload[1].value)}
+          </p>
+        )}
+      </div>
+    );
+  }
+  return null;
+}
+
 export default function DashboardPage() {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
@@ -165,26 +204,8 @@ export default function DashboardPage() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Time-aware greeting and date state (deferred to client mount to avoid prerender date error)
-  const [greeting, setGreeting] = useState("Good morning");
-  const [todayFormatted, setTodayFormatted] = useState("Thursday, 05 Nov 2026");
-
-  useEffect(() => {
-    const now = new Date();
-    const hour = now.getHours();
-    if (hour < 12) setGreeting("Good morning");
-    else if (hour < 18) setGreeting("Good afternoon");
-    else setGreeting("Good evening");
-
-    setTodayFormatted(
-      new Intl.DateTimeFormat("en-PK", {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      }).format(now)
-    );
-  }, []);
+  // Time-aware greeting and date state
+  const [{ greeting, todayFormatted }] = useState(getGreetingAndDate);
 
   // Trigger WhatsApp reminder toast
   const handleRemind = (studentName, amount) => {
@@ -203,28 +224,6 @@ export default function DashboardPage() {
   // Recharts styling tokens based on theme
   const chartStroke = isDark ? "#334155" : "#E2E8F0";
   const chartText = isDark ? "#94A3B8" : "#64748B";
-
-  // Custom Recharts Area Chart Tooltip
-  const CustomAreaTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-lg dark:border-slate-800 dark:bg-[#131A2E] text-xs space-y-1">
-          <p className="font-heading font-bold text-slate-800 dark:text-slate-100">
-            {label} 2026
-          </p>
-          <p className="text-primary-600 dark:text-primary-400 font-semibold">
-            Collected: Rs. {new Intl.NumberFormat("en-PK").format(payload[0].value)}
-          </p>
-          {payload[1] && (
-            <p className="text-slate-400">
-              Target: Rs. {new Intl.NumberFormat("en-PK").format(payload[1].value)}
-            </p>
-          )}
-        </div>
-      );
-    }
-    return null;
-  };
 
   // 1. SKELETON LOADING STATE (800ms)
   if (isLoading) {

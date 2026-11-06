@@ -40,18 +40,21 @@ export function Modal({
 
           {/* Modal Content with scale & fade */}
           <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-label={title}
             initial={{ opacity: 0, scale: 0.95, y: 8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 8 }}
             transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1.0] }}
             className={cn(
-              "relative z-10 w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl",
+              "relative z-10 w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl max-h-[90vh] flex flex-col overflow-hidden",
               "dark:border-slate-800 dark:bg-[#131A2E]",
               className
             )}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+            <div className="flex shrink-0 items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
               <h3 className="font-heading text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100">
                 {title}
               </h3>
@@ -65,7 +68,7 @@ export function Modal({
             </div>
 
             {/* Modal Body */}
-            <div className="mt-4">{children}</div>
+            <div className="mt-4 flex-1 overflow-y-auto pr-1">{children}</div>
           </motion.div>
         </div>
       )}

@@ -36,7 +36,7 @@ export function MobileNav({
     if (isDrawerOpen && onCloseDrawer) {
       onCloseDrawer();
     }
-  }, [pathname]);
+  }, [pathname, isDrawerOpen, onCloseDrawer]);
 
   // Close drawer on Escape key
   useEffect(() => {

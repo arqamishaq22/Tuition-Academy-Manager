@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Menu,
@@ -30,6 +30,7 @@ const pageTitles = {
 
 export function Topbar({ onMenuClick }) {
   const pathname = usePathname();
+  const router = useRouter();
   const searchInputRef = useRef(null);
 
   // States
@@ -149,6 +150,7 @@ export function Topbar({ onMenuClick }) {
             className="flex items-center space-x-2 rounded-xl p-1 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-colors"
             aria-expanded={isDropdownOpen}
             aria-haspopup="true"
+            aria-label="User account menu"
           >
             <Avatar name="Arqam Ishaq" size="sm" />
             <div className="hidden xl:block text-left pr-1">
@@ -204,9 +206,7 @@ export function Topbar({ onMenuClick }) {
                   <button
                     onClick={() => {
                       setIsDropdownOpen(false);
-                      if (typeof window !== "undefined") {
-                        window.location.href = "/login";
-                      }
+                      router.push("/login");
                     }}
                     className="flex w-full items-center space-x-2.5 rounded-xl px-3 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
                   >
