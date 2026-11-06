@@ -33,3 +33,40 @@ export function formatDate(dateString) {
   }).format(date);
 }
 
+/**
+ * Calculate grade based on percentage:
+ * 90 and above: A+
+ * 80 to 89: A
+ * 70 to 79: B
+ * 60 to 69: C
+ * 50 to 59: D
+ * Below 50: F (fail)
+ */
+export function calculateGrade(percentage) {
+  if (percentage === undefined || percentage === null || isNaN(percentage)) {
+    return "F";
+  }
+  const pct = Number(percentage);
+  if (pct >= 90) return "A+";
+  if (pct >= 80) return "A";
+  if (pct >= 70) return "B";
+  if (pct >= 60) return "C";
+  if (pct >= 50) return "D";
+  return "F";
+}
+
+/**
+ * Return badge variant for a letter grade:
+ * A+, A: success
+ * B: info
+ * C, D: warning
+ * F: danger
+ */
+export function getGradeBadgeVariant(grade) {
+  if (grade === "A+" || grade === "A") return "success";
+  if (grade === "B") return "info";
+  if (grade === "C" || grade === "D") return "warning";
+  return "danger";
+}
+
+
