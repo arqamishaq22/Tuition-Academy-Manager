@@ -7,3 +7,4 @@ export const metadata = {
 export default function AttendanceSubLayout({ children }) {
   return children;
 }
+

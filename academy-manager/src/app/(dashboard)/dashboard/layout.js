@@ -7,3 +7,4 @@ export const metadata = {
 export default function DashboardSubLayout({ children }) {
   return children;
 }
+
