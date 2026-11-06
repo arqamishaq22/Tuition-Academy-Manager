@@ -176,7 +176,7 @@ export default function FeesPage() {
     if (preselectedStudent) {
       setCollectForm({
         student: preselectedStudent,
-        amount: String(preselectedStudent.balance || preselectedStudent.amount),
+        amount: String(preselectedStudent?.balance ?? preselectedStudent?.amount ?? 0),
         method: "Cash",
         note: "",
         date: "2026-11-06",
@@ -198,10 +198,11 @@ export default function FeesPage() {
 
   // Select student in Step 1
   const handlePickStudent = (record) => {
+    if (!record) return;
     setCollectForm((prev) => ({
       ...prev,
       student: record,
-      amount: String(record.balance > 0 ? record.balance : record.amount),
+      amount: String((record?.balance ?? 0) > 0 ? record.balance : (record?.amount ?? 0)),
     }));
     setCollectStep(2);
   };
@@ -209,8 +210,11 @@ export default function FeesPage() {
   // Submit collected fee in Step 2
   const handleSubmitPayment = (e) => {
     e.preventDefault();
+    const student = collectForm.student;
+    if (!student) return;
+
     const enteredAmount = Number(collectForm.amount);
-    const balance = collectForm.student.balance > 0 ? collectForm.student.balance : collectForm.student.amount;
+    const balance = (student?.balance ?? 0) > 0 ? (student?.balance ?? 0) : (student?.amount ?? 0);
 
     if (!enteredAmount || enteredAmount <= 0) {
       setCollectError("Please enter a valid amount in PKR");
@@ -222,14 +226,16 @@ export default function FeesPage() {
     }
 
     const receiptNum = `REC-2026-${Math.floor(1000 + Math.random() * 9000)}`;
-    const newPaidAmount = collectForm.student.paidAmount + enteredAmount;
-    const remainingBalance = collectForm.student.amount - newPaidAmount;
+    const studentPaidAmount = student?.paidAmount ?? 0;
+    const studentTotalAmount = student?.amount ?? 0;
+    const newPaidAmount = studentPaidAmount + enteredAmount;
+    const remainingBalance = Math.max(0, studentTotalAmount - newPaidAmount);
     const newStatus = remainingBalance === 0 ? "Paid" : "Partial";
 
     // Update in-memory fee records
     setFeeRecords((prev) =>
       prev.map((rec) =>
-        rec.id === collectForm.student.id
+        rec.id === student.id
           ? {
               ...rec,
               paidAmount: newPaidAmount,
@@ -245,14 +251,14 @@ export default function FeesPage() {
 
     const generatedReceipt = {
       receiptNumber: receiptNum,
-      studentName: collectForm.student.studentName,
-      rollNumber: collectForm.student.rollNumber,
-      className: collectForm.student.className,
+      studentName: student.studentName,
+      rollNumber: student.rollNumber,
+      className: student.className,
       amount: enteredAmount,
       balance: remainingBalance,
       paymentMethod: collectForm.method,
       date: collectForm.date,
-      phone: collectForm.student.phone,
+      phone: student.phone,
     };
 
     setLatestReceipt(generatedReceipt);
@@ -260,12 +266,13 @@ export default function FeesPage() {
     showToast(
       "success",
       "Payment Recorded",
-      `Received ${formatPKR(enteredAmount)} from ${collectForm.student.studentName}.`
+      `Received ${formatPKR(enteredAmount)} from ${student.studentName}.`
     );
   };
 
   // Print Receipt in a clean printable window
   const handlePrintReceipt = (receipt) => {
+    if (!receipt) return;
     const printWindow = window.open("", "_blank");
     if (!printWindow) {
       window.print();
@@ -297,13 +304,13 @@ export default function FeesPage() {
               <div class="sub">Official Tuition Fee Receipt</div>
               <div class="rec-no">Receipt #: ${receipt.receiptNumber}</div>
             </div>
-            <div class="row"><span>Date:</span><strong>${receipt.date}</strong></div>
+            <div class="row"><span>Date:</span><strong>${receipt.date || "2026-11-06"}</strong></div>
             <div class="row"><span>Student Name:</span><strong>${receipt.studentName}</strong></div>
             <div class="row"><span>Roll Number:</span><strong>${receipt.rollNumber}</strong></div>
             <div class="row"><span>Class / Batch:</span><strong>${receipt.className}</strong></div>
             <div class="row"><span>Payment Method:</span><strong>${receipt.paymentMethod}</strong></div>
-            <div class="row total-row"><span>Amount Received:</span><span>Rs. ${Number(receipt.amount).toLocaleString("en-PK")}</span></div>
-            <div class="row"><span>Remaining Balance:</span><strong>Rs. ${Number(receipt.balance).toLocaleString("en-PK")}</strong></div>
+            <div class="row total-row"><span>Amount Received:</span><span>Rs. ${Number(receipt.amount || 0).toLocaleString("en-PK")}</span></div>
+            <div class="row"><span>Remaining Balance:</span><strong>Rs. ${Number(receipt.balance || 0).toLocaleString("en-PK")}</strong></div>
             <div class="footer">
               <p>Thank you for the prompt fee payment.</p>
               <p>Academy Manager SaaS • System Generated</p>
@@ -320,7 +327,12 @@ export default function FeesPage() {
 
   // WhatsApp receipt sender link
   const buildReceiptWhatsAppLink = (receipt) => {
-    const message = `Assalam o Alaikum, fee payment of ${formatPKR(receipt.amount)} for ${receipt.studentName} (${receipt.className}) has been received on ${receipt.date}. Remaining balance: ${formatPKR(receipt.balance)}. Receipt #${receipt.receiptNumber}. Thank you!`;
+    if (!receipt) return "#";
+    const amountVal = receipt.amount ?? receipt.paidAmount ?? 0;
+    const balanceVal = receipt.balance ?? 0;
+    const dateVal = receipt.date || receipt.paidDate || "today";
+    const receiptNum = receipt.receiptNumber || "N/A";
+    const message = `Assalam o Alaikum, fee payment of ${formatPKR(amountVal)} for ${receipt.studentName || "student"} (${receipt.className || ""}) has been received on ${dateVal}. Remaining balance: ${formatPKR(balanceVal)}. Receipt #${receiptNum}. Thank you!`;
     const cleanPhone = (receipt.phone || "").replace(/[^0-9]/g, "");
     const waPhone = cleanPhone.startsWith("0") ? "92" + cleanPhone.slice(1) : cleanPhone;
     return `https://wa.me/${waPhone}?text=${encodeURIComponent(message)}`;
@@ -1150,13 +1162,13 @@ export default function FeesPage() {
             {/* Student Mini Card */}
             <div className="flex items-center justify-between rounded-xl bg-slate-50 p-3 dark:bg-slate-900/60">
               <div className="flex items-center gap-3">
-                <Avatar name={collectForm.student.studentName} size="md" />
+                <Avatar name={collectForm.student?.studentName || "Student"} size="md" />
                 <div>
                   <h4 className="font-heading text-sm font-bold text-slate-900 dark:text-slate-100">
-                    {collectForm.student.studentName}
+                    {collectForm.student?.studentName}
                   </h4>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Roll #{collectForm.student.rollNumber} • {collectForm.student.className}
+                    Roll #{collectForm.student?.rollNumber} • {collectForm.student?.className}
                   </p>
                 </div>
               </div>
@@ -1166,7 +1178,7 @@ export default function FeesPage() {
                   Due Balance
                 </span>
                 <p className="text-sm font-bold text-rose-600 dark:text-rose-400">
-                  {formatPKR(collectForm.student.balance || collectForm.student.amount)}
+                  {formatPKR(collectForm.student?.balance || collectForm.student?.amount || 0)}
                 </p>
               </div>
             </div>
@@ -1289,37 +1301,37 @@ export default function FeesPage() {
                     Official Receipt
                   </span>
                   <p className="text-xs font-mono font-bold text-slate-800 dark:text-slate-200">
-                    {latestReceipt.receiptNumber}
+                    {latestReceipt?.receiptNumber}
                   </p>
                 </div>
                 <span className="text-xs text-slate-500 dark:text-slate-400">
-                  {latestReceipt.date}
+                  {latestReceipt?.date}
                 </span>
               </div>
 
               <div className="mt-3 space-y-1.5 text-xs text-slate-700 dark:text-slate-300">
                 <div className="flex justify-between">
                   <span className="text-slate-500">Student:</span>
-                  <span className="font-bold">{latestReceipt.studentName} ({latestReceipt.rollNumber})</span>
+                  <span className="font-bold">{latestReceipt?.studentName} ({latestReceipt?.rollNumber})</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Class:</span>
-                  <span>{latestReceipt.className}</span>
+                  <span>{latestReceipt?.className}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Method:</span>
-                  <span className="font-medium">{latestReceipt.paymentMethod}</span>
+                  <span className="font-medium">{latestReceipt?.paymentMethod}</span>
                 </div>
                 <div className="flex justify-between pt-2 border-t border-indigo-100 dark:border-indigo-900/50">
                   <span className="font-bold text-slate-900 dark:text-slate-100">Amount Paid:</span>
                   <span className="font-bold text-emerald-600 dark:text-emerald-400 text-sm">
-                    {formatPKR(latestReceipt.amount)}
+                    {formatPKR(latestReceipt?.amount ?? 0)}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Remaining Balance:</span>
                   <span className="font-bold text-rose-600 dark:text-rose-400">
-                    {formatPKR(latestReceipt.balance)}
+                    {formatPKR(latestReceipt?.balance ?? 0)}
                   </span>
                 </div>
               </div>
