@@ -86,6 +86,10 @@ CREATE TABLE users (
   role ENUM('owner', 'teacher', 'staff', 'parent') NOT NULL DEFAULT 'owner',
   avatar_url VARCHAR(255) NULL,
   is_active BOOLEAN NOT NULL DEFAULT TRUE,
+  failed_login_count TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  locked_until DATETIME NULL,
+  reset_password_token_hash VARCHAR(255) NULL,
+  reset_password_expires_at DATETIME NULL,
   last_login_at DATETIME NULL,
   deleted_at DATETIME NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -95,6 +99,8 @@ CREATE TABLE users (
   INDEX idx_users_role (role),
   INDEX idx_users_phone (phone),
   INDEX idx_users_is_active (is_active),
+  INDEX idx_users_locked_until (locked_until),
+  INDEX idx_users_reset_token (reset_password_token_hash),
   INDEX idx_users_deleted_at (deleted_at),
   FOREIGN KEY (academy_id) REFERENCES academies(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -74,7 +74,12 @@ erDiagram
     bigint_unsigned academy_id FK
     varchar name
     varchar email
+    varchar phone
     enum role
+    tinyint_unsigned failed_login_count
+    datetime locked_until
+    char reset_password_token_hash
+    datetime reset_password_expires_at
     boolean is_active
     datetime deleted_at
   }
@@ -344,3 +349,4 @@ ORDER BY s.roll_no ASC, sub.name ASC;
   * `idx_marks_exam_subject_id (exam_subject_id)`
   * `idx_marks_academy_id (academy_id)`
   * `uq_marks_exam_subject_student (exam_subject_id, student_id)`
+

@@ -30,13 +30,20 @@ export function sendSuccess(res, data = null, meta = null, status = 200) {
  * @param {string} message - Error description
  * @param {Array} errors - Optional field-level error details
  * @param {number} status - HTTP status code (defaults to 500)
+ * @param {string|null} code - Optional error code (e.g. 'TOKEN_EXPIRED')
  */
-export function sendError(res, message = "Internal Server Error", errors = [], status = 500) {
-  return res.status(status).json({
+export function sendError(res, message = "Internal Server Error", errors = [], status = 500, code = null) {
+  const payload = {
     success: false,
     message,
     errors: Array.isArray(errors) ? errors : [errors],
-  });
+  };
+
+  if (code) {
+    payload.code = code;
+  }
+
+  return res.status(status).json(payload);
 }
 
 export default {

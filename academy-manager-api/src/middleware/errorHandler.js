@@ -13,6 +13,7 @@ export function errorHandler(err, req, res, next) {
   let statusCode = 500;
   let message = "Internal Server Error";
   let errors = [];
+  let errorCode = err.code || null;
 
   // Log error details for server diagnostics
   logger.error(`${req.method} ${req.originalUrl} - ${err.message}`);
@@ -25,6 +26,7 @@ export function errorHandler(err, req, res, next) {
     statusCode = err.statusCode;
     message = err.message;
     errors = err.errors;
+    errorCode = err.code || null;
   }
   // 2. Direct Zod Validation Error (if not caught by validate middleware)
   else if (err instanceof ZodError) {
@@ -107,7 +109,7 @@ export function errorHandler(err, req, res, next) {
     errors = env.NODE_ENV === "production" ? [] : [{ stack: err.stack }];
   }
 
-  return sendError(res, message, errors, statusCode);
+  return sendError(res, message, errors, statusCode, errorCode);
 }
 
 export default errorHandler;

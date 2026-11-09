@@ -1,0 +1,207 @@
+{
+  "info": {
+    "name": "Academy Manager API - Authentication Module",
+    "description": "Postman Collection for Tuition Academy Manager Authentication endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api/v1/auth",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Signup (Owner & Academy)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Prof. Muhammad Tariq\",\n  \"email\": \"tariq@scienceacademy.pk\",\n  \"phone\": \"03001234567\",\n  \"password\": \"Pakistan@2026\",\n  \"academyName\": \"Apex Science Academy\",\n  \"city\": \"Lahore\",\n  \"studentsRange\": \"50-100\",\n  \"subjects\": [\"Physics\", \"Chemistry\", \"Mathematics\", \"Biology\"]\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/signup",
+          "host": ["{{baseUrl}}"],
+          "path": ["signup"]
+        }
+      }
+    },
+    {
+      "name": "2. Login (Owner / Teacher / Staff)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"owner@demo.com\",\n  \"password\": \"Demo@1234\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["login"]
+        }
+      }
+    },
+    {
+      "name": "3. Parent Login (Phone & Password)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"phone\": \"0300-1110001\",\n  \"password\": \"Demo@1234\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/parent-login",
+          "host": ["{{baseUrl}}"],
+          "path": ["parent-login"]
+        }
+      }
+    },
+    {
+      "name": "4. Refresh Token",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"refreshToken\": \"<optional_if_cookie_is_sent>\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/refresh",
+          "host": ["{{baseUrl}}"],
+          "path": ["refresh"]
+        }
+      }
+    },
+    {
+      "name": "5. Get Profile (/me)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/me",
+          "host": ["{{baseUrl}}"],
+          "path": ["me"]
+        }
+      }
+    },
+    {
+      "name": "6. Update Profile (/me)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Arqam Ishaq Updated\",\n  \"phone\": \"0300-5551234\",\n  \"avatarUrl\": \"https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/me",
+          "host": ["{{baseUrl}}"],
+          "path": ["me"]
+        }
+      }
+    },
+    {
+      "name": "7. Change Password",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"currentPassword\": \"Demo@1234\",\n  \"newPassword\": \"NewSecretPass123\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/change-password",
+          "host": ["{{baseUrl}}"],
+          "path": ["change-password"]
+        }
+      }
+    },
+    {
+      "name": "8. Forgot Password",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"owner@demo.com\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/forgot-password",
+          "host": ["{{baseUrl}}"],
+          "path": ["forgot-password"]
+        }
+      }
+    },
+    {
+      "name": "9. Reset Password",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"token\": \"<hex_token_from_email_or_console>\",\n  \"email\": \"owner@demo.com\",\n  \"newPassword\": \"NewlyResetPassword123\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/reset-password",
+          "host": ["{{baseUrl}}"],
+          "path": ["reset-password"]
+        }
+      }
+    },
+    {
+      "name": "10. Logout (Current Session)",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/logout",
+          "host": ["{{baseUrl}}"],
+          "path": ["logout"]
+        }
+      }
+    },
+    {
+      "name": "11. Logout All Sessions",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/logout-all",
+          "host": ["{{baseUrl}}"],
+          "path": ["logout-all"]
+        }
+      }
+    }
+  ]
+}
