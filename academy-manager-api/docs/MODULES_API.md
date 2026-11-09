@@ -485,3 +485,4 @@ curl -X PUT "http://localhost:5000/api/v1/teachers/6" \
 curl -X DELETE "http://localhost:5000/api/v1/teachers/6" \
   -H "Authorization: Bearer <accessToken>"
 ```
+
