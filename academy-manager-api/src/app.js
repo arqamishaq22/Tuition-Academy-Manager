@@ -73,6 +73,11 @@ const globalRateLimiter = rateLimit({
 app.use(globalRateLimiter);
 
 /**
+ * 7.5. Serve Static Uploads (Student Photos, Slips)
+ */
+app.use("/uploads", express.static("uploads"));
+
+/**
  * 8. Mount Main API Routes under /api/v1
  */
 app.use("/api/v1", routes);

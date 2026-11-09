@@ -4,6 +4,7 @@ import { sendSuccess } from "../utils/response.js";
 import authRoutes from "./auth.routes.js";
 import studentRoutes from "./student.routes.js";
 import classRoutes from "./class.routes.js";
+import teacherRoutes from "./teacher.routes.js";
 import attendanceRoutes from "./attendance.routes.js";
 import feeRoutes from "./fee.routes.js";
 import resultRoutes from "./result.routes.js";
@@ -37,6 +38,7 @@ router.get("/health", async (req, res, next) => {
 router.use("/auth", authRoutes);
 router.use("/students", studentRoutes);
 router.use("/classes", classRoutes);
+router.use("/teachers", teacherRoutes);
 router.use("/attendance", attendanceRoutes);
 router.use("/fees", feeRoutes);
 router.use("/results", resultRoutes);
