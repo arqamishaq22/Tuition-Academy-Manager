@@ -88,3 +88,4 @@ process.on("uncaughtException", (error) => {
 
 // Launch server
 startServer();
+

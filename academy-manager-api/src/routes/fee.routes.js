@@ -19,3 +19,4 @@ router.post(
 router.get("/receipts/:id", feeController.getReceipt);
 
 export default router;
+

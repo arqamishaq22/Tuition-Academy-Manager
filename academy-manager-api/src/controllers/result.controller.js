@@ -32,3 +32,4 @@ export default {
   saveMarks,
   getReportCard,
 };
+

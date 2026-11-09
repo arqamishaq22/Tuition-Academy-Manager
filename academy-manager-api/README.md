@@ -194,3 +194,4 @@ All responses follow a predictable JSON format:
   ]
 }
 ```
+

@@ -45,3 +45,4 @@ export default {
   updateStudent,
   deleteStudent,
 };
+

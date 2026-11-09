@@ -25,3 +25,4 @@ router.post(
 router.get("/report-card/:studentId", resultController.getReportCard);
 
 export default router;
+

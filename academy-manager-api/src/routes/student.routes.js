@@ -27,3 +27,4 @@ router.put(
 router.delete("/:id", roleGuard("admin", "owner"), studentController.deleteStudent);
 
 export default router;
+

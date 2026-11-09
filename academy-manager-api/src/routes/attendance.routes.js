@@ -19,3 +19,4 @@ router.get("/class", attendanceController.getClassAttendance);
 router.get("/summary", attendanceController.getMonthlySummary);
 
 export default router;
+
