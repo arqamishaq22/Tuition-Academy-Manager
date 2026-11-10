@@ -306,6 +306,33 @@ export async function getStudentById(academyId, studentId, user = null) {
 // ============================================================================
 export async function createStudent(academyId, data, currentUserId = null) {
   return await withTransaction(async (conn) => {
+    // 0. Verify Academy Plan and Enforce Student Limit
+    const [academyRows] = await conn.query(
+      `SELECT plan FROM academies WHERE id = :academyId LIMIT 1`,
+      { academyId }
+    );
+    const plan = academyRows[0]?.plan || "free_pilot";
+    const planLimits = {
+      free_pilot: 50,
+      standard: 200,
+      pro: Infinity,
+    };
+    const maxStudents = planLimits[plan] !== undefined ? planLimits[plan] : 50;
+
+    if (maxStudents !== Infinity) {
+      const [totalActiveRows] = await conn.query(
+        `SELECT COUNT(*) AS total_active FROM students 
+         WHERE academy_id = :academyId AND status = 'active' AND deleted_at IS NULL`,
+        { academyId }
+      );
+      const totalActive = totalActiveRows[0]?.total_active || 0;
+      if (totalActive >= maxStudents) {
+        throw ApiError.paymentRequired(
+          `Student limit reached for the '${plan}' plan (maximum ${maxStudents} active students). Please upgrade your subscription plan to enroll additional students.`
+        );
+      }
+    }
+
     // 1. Verify Class and Check Capacity
     const [classRows] = await conn.query(
       `SELECT id, name, capacity, monthly_fee 

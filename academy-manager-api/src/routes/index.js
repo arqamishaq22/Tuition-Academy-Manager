@@ -10,6 +10,9 @@ import feeRoutes from "./fee.routes.js";
 import examRoutes from "./exam.routes.js";
 import dashboardRoutes from "./dashboard.routes.js";
 import reportRoutes from "./report.routes.js";
+import parentRoutes from "./parent.routes.js";
+import noticeRoutes from "./notice.routes.js";
+import settingRoutes from "./setting.routes.js";
 
 const router = Router();
 
@@ -47,6 +50,9 @@ router.use("/exams", examRoutes);
 router.use("/results", examRoutes);
 router.use("/dashboard", dashboardRoutes);
 router.use("/reports", reportRoutes);
+router.use("/parent", parentRoutes);
+router.use("/notices", noticeRoutes);
+router.use("/settings", settingRoutes);
 
 export default router;
 

@@ -13,7 +13,8 @@
     "test:fees": "node tests/fee.test.js",
     "test:concurrency": "node scripts/test-fees.js",
     "test:exams": "node tests/exam.test.js",
-    "test:analytics": "node tests/dashboard_reports.test.js"
+    "test:analytics": "node tests/dashboard_reports.test.js",
+    "test:portal": "node tests/parent_notices_settings.test.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

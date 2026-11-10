@@ -4,15 +4,19 @@ import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
 import ApiError from "../utils/ApiError.js";
 
-// Ensure root uploads and students sub-directory exist on disk
+// Ensure root uploads and sub-directories exist on disk
 const rootUploadDir = path.resolve(process.cwd(), "uploads");
 const studentPhotoDir = path.resolve(rootUploadDir, "students");
+const logoUploadDir = path.resolve(rootUploadDir, "logos");
 
 if (!fs.existsSync(rootUploadDir)) {
   fs.mkdirSync(rootUploadDir, { recursive: true });
 }
 if (!fs.existsSync(studentPhotoDir)) {
   fs.mkdirSync(studentPhotoDir, { recursive: true });
+}
+if (!fs.existsSync(logoUploadDir)) {
+  fs.mkdirSync(logoUploadDir, { recursive: true });
 }
 
 // 1. General disk storage
@@ -88,6 +92,35 @@ export const uploadStudentPhoto = multer({
     } else {
       cb(
         ApiError.badRequest("Only JPG and PNG images are allowed for student photos (max 2MB)."),
+        false
+      );
+    }
+  },
+});
+
+// 4. Academy Logo Storage (disk storage in uploads/logos, max 1MB, JPG or PNG)
+const logoStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, logoUploadDir);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    cb(null, `logo-${uuidv4()}${ext}`);
+  },
+});
+
+export const uploadLogo = multer({
+  storage: logoStorage,
+  limits: {
+    fileSize: 1 * 1024 * 1024, // 1MB max
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(
+        ApiError.badRequest("Only JPG and PNG images are allowed for academy logo (max 1MB)."),
         false
       );
     }

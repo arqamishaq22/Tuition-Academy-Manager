@@ -351,3 +351,4 @@ WHERE academy_id = 1
 GROUP BY date, status;
 ```
 - **Type**: `range` scan using `idx_attendance_date` / `idx_attendance_academy_date`.
+

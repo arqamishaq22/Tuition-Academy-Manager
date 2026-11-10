@@ -56,3 +56,4 @@ router.get(
 router.get("/top-classes", dashboardController.getTopClasses);
 
 export default router;
+

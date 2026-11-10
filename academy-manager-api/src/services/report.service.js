@@ -869,3 +869,4 @@ export default {
   getIncomeVsSalaryReport,
   getClassPerformanceReport,
 };
+

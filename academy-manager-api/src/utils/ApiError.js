@@ -39,6 +39,10 @@ export class ApiError extends Error {
     return new ApiError(409, msg, errors, code);
   }
 
+  static paymentRequired(msg = "Payment required / Subscription limit exceeded", errors = [], code = "PLAN_LIMIT_EXCEEDED") {
+    return new ApiError(402, msg, errors, code);
+  }
+
   static unprocessable(msg = "Validation failed", errors = [], code = null) {
     return new ApiError(422, msg, errors, code);
   }
