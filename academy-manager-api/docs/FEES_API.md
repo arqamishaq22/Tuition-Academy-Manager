@@ -531,3 +531,4 @@ curl -X PUT "http://localhost:5000/api/v1/fees/structure" \
     "fromYear": 2027
   }'
 ```
+

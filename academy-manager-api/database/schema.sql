@@ -29,6 +29,7 @@ DROP TABLE IF EXISTS activity_logs;
 DROP TABLE IF EXISTS reminder_logs;
 DROP TABLE IF EXISTS notice_reads;
 DROP TABLE IF EXISTS notices;
+DROP TABLE IF EXISTS report_remarks;
 DROP TABLE IF EXISTS marks;
 DROP TABLE IF EXISTS exam_subjects;
 DROP TABLE IF EXISTS exams;
@@ -386,7 +387,8 @@ CREATE TABLE marks (
   academy_id BIGINT UNSIGNED NOT NULL,
   exam_subject_id BIGINT UNSIGNED NOT NULL,
   student_id BIGINT UNSIGNED NOT NULL,
-  marks_obtained DECIMAL(5, 2) NOT NULL DEFAULT 0.00,
+  marks_obtained DECIMAL(5, 2) NULL DEFAULT NULL,
+  is_absent BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   UNIQUE KEY uq_marks_exam_subject_student (exam_subject_id, student_id),
@@ -396,6 +398,28 @@ CREATE TABLE marks (
   FOREIGN KEY (academy_id) REFERENCES academies(id) ON DELETE CASCADE,
   FOREIGN KEY (exam_subject_id) REFERENCES exam_subjects(id) ON DELETE CASCADE,
   FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================================
+-- 14b. REPORT_REMARKS (Teacher Remarks on Exam Report Cards)
+-- ============================================================================
+CREATE TABLE report_remarks (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  academy_id BIGINT UNSIGNED NOT NULL,
+  exam_id BIGINT UNSIGNED NOT NULL,
+  student_id BIGINT UNSIGNED NOT NULL,
+  remark TEXT NOT NULL,
+  created_by BIGINT UNSIGNED NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_report_remarks_exam_student (exam_id, student_id),
+  INDEX idx_report_remarks_academy_id (academy_id),
+  INDEX idx_report_remarks_exam_id (exam_id),
+  INDEX idx_report_remarks_student_id (student_id),
+  FOREIGN KEY (academy_id) REFERENCES academies(id) ON DELETE CASCADE,
+  FOREIGN KEY (exam_id) REFERENCES exams(id) ON DELETE CASCADE,
+  FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+  FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================================

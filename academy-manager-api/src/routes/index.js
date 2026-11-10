@@ -7,7 +7,7 @@ import classRoutes from "./class.routes.js";
 import teacherRoutes from "./teacher.routes.js";
 import attendanceRoutes from "./attendance.routes.js";
 import feeRoutes from "./fee.routes.js";
-import resultRoutes from "./result.routes.js";
+import examRoutes from "./exam.routes.js";
 
 const router = Router();
 
@@ -41,7 +41,8 @@ router.use("/classes", classRoutes);
 router.use("/teachers", teacherRoutes);
 router.use("/attendance", attendanceRoutes);
 router.use("/fees", feeRoutes);
-router.use("/results", resultRoutes);
+router.use("/exams", examRoutes);
+router.use("/results", examRoutes);
 
 export default router;
 

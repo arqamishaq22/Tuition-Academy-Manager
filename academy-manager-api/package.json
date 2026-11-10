@@ -11,7 +11,8 @@
     "test:modules": "node tests/modules.test.js",
     "test:attendance": "node tests/attendance.test.js",
     "test:fees": "node tests/fee.test.js",
-    "test:concurrency": "node scripts/test-fees.js"
+    "test:concurrency": "node scripts/test-fees.js",
+    "test:exams": "node tests/exam.test.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
