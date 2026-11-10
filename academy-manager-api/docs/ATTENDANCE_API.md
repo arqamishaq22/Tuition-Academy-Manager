@@ -425,3 +425,4 @@ ORDER BY CAST(s.roll_no AS UNSIGNED) ASC;
   - **Ref**: `academy_manager.s.id`
   - **Rows**: `2`
 - **Execution Time**: `~3.8 ms`
+

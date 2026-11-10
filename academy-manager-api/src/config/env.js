@@ -1,8 +1,11 @@
 import dotenv from "dotenv";
 import { z } from "zod";
+import path from "path";
+import { fileURLToPath } from "url";
 
 // Load environment variables from .env file
-dotenv.config();
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 /**
  * Zod Schema to validate all required and optional environment variables at startup.
