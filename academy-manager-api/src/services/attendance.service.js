@@ -1,5 +1,6 @@
 import { query, withTransaction } from "../config/db.js";
 import ApiError from "../utils/ApiError.js";
+import { clearDashboardCache } from "../utils/cache.js";
 import {
   calculateAttendancePercentage,
   getTodayDateKarachi,
@@ -241,7 +242,8 @@ export async function markAttendance(academyId, { classId, date, records }, user
     );
   });
 
-  // 6. Return updated class attendance summary
+  // 6. Clear dashboard cache and return updated class attendance summary
+  clearDashboardCache(academyId);
   return await getClassAttendance(academyId, classId, date, user);
 }
 
@@ -293,6 +295,8 @@ export async function updateAttendanceRecord(academyId, attendanceId, { status, 
       }),
     }
   );
+
+  clearDashboardCache(academyId);
 
   return {
     id: attendanceId,

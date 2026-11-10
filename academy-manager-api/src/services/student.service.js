@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import { query, withTransaction } from "../config/db.js";
 import ApiError from "../utils/ApiError.js";
+import { clearDashboardCache } from "../utils/cache.js";
 import { normalizePakistaniPhone, formatPakistaniPhone } from "../utils/phone.js";
 
 /**
@@ -468,6 +469,9 @@ export async function createStudent(academyId, data, currentUserId = null) {
       parentUserId,
     };
   });
+
+  clearDashboardCache(academyId);
+  return result;
 }
 
 // ============================================================================
@@ -565,6 +569,7 @@ export async function updateStudent(academyId, studentId, data, currentUserId = 
     );
   });
 
+  clearDashboardCache(academyId);
   return await getStudentById(academyId, studentId);
 }
 
@@ -600,6 +605,8 @@ export async function deleteStudent(academyId, studentId, currentUserId = null) 
       }),
     }
   );
+
+  clearDashboardCache(academyId);
 
   return { message: "Student record soft-deleted successfully." };
 }

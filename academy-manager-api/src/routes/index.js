@@ -8,6 +8,8 @@ import teacherRoutes from "./teacher.routes.js";
 import attendanceRoutes from "./attendance.routes.js";
 import feeRoutes from "./fee.routes.js";
 import examRoutes from "./exam.routes.js";
+import dashboardRoutes from "./dashboard.routes.js";
+import reportRoutes from "./report.routes.js";
 
 const router = Router();
 
@@ -43,6 +45,8 @@ router.use("/attendance", attendanceRoutes);
 router.use("/fees", feeRoutes);
 router.use("/exams", examRoutes);
 router.use("/results", examRoutes);
+router.use("/dashboard", dashboardRoutes);
+router.use("/reports", reportRoutes);
 
 export default router;
 

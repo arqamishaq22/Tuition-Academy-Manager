@@ -1,5 +1,6 @@
 import { query, withTransaction } from "../config/db.js";
 import ApiError from "../utils/ApiError.js";
+import { clearDashboardCache } from "../utils/cache.js";
 import {
   calculateFeeStatus,
   calculateBalance,
@@ -98,6 +99,8 @@ export async function generateMonthlyFees(academyId, { month, year, classId }) {
       );
     }
   });
+
+  clearDashboardCache(academyId);
 
   return {
     created: studentsToInsert.length,
@@ -683,6 +686,9 @@ export async function collectPayment(academyId, userId, data) {
 
     throw ApiError.badRequest("Either feeId or studentId must be specified for collecting payment.");
   });
+
+  clearDashboardCache(academyId);
+  return result;
 }
 
 /**
@@ -965,6 +971,9 @@ export async function reversePayment(academyId, userId, paymentId, reason) {
       },
     };
   });
+
+  clearDashboardCache(academyId);
+  return result;
 }
 
 /**
@@ -1060,6 +1069,9 @@ export async function adjustFee(academyId, userId, feeId, adjustments) {
       status: newStatus,
     };
   });
+
+  clearDashboardCache(academyId);
+  return result;
 }
 
 /**
@@ -1362,6 +1374,9 @@ export async function updateFeeStructure(academyId, userId, { updates, applyToAc
       appliedToActiveStudents: Boolean(applyToActiveStudents),
     };
   });
+
+  clearDashboardCache(academyId);
+  return result;
 }
 
 /**
@@ -1411,6 +1426,9 @@ export async function markOverdueAndApplyLateFees(academyId = null) {
       updatedCount: (res1.affectedRows || 0) + (res2.affectedRows || 0),
     };
   });
+
+  clearDashboardCache(academyId);
+  return result;
 }
 
 export default {
