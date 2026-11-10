@@ -135,3 +135,4 @@ export default {
   markNoticeRead,
   getAcademyContact,
 };
+

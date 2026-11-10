@@ -4,48 +4,90 @@ import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
 import ApiError from "../utils/ApiError.js";
 
-// Ensure root uploads and sub-directories exist on disk
+// Root upload directory
 const rootUploadDir = path.resolve(process.cwd(), "uploads");
-const studentPhotoDir = path.resolve(rootUploadDir, "students");
-const logoUploadDir = path.resolve(rootUploadDir, "logos");
 
+// Ensure root and sub-directories exist
+const subDirs = ["students", "logos", "documents", "general"];
 if (!fs.existsSync(rootUploadDir)) {
   fs.mkdirSync(rootUploadDir, { recursive: true });
 }
-if (!fs.existsSync(studentPhotoDir)) {
-  fs.mkdirSync(studentPhotoDir, { recursive: true });
+for (const sub of subDirs) {
+  const dirPath = path.resolve(rootUploadDir, sub);
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true });
+  }
 }
-if (!fs.existsSync(logoUploadDir)) {
-  fs.mkdirSync(logoUploadDir, { recursive: true });
+
+// Allowed MIME types & extensions
+const ALLOWED_MIME_TYPES = new Set([
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp",
+  "application/pdf",
+]);
+
+const ALLOWED_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp", ".pdf"]);
+
+/**
+ * File filter checking both extension and real MIME type.
+ */
+function fileFilter(req, file, cb) {
+  const ext = path.extname(file.originalname).toLowerCase();
+  const mime = file.mimetype.toLowerCase();
+
+  if (ALLOWED_EXTENSIONS.has(ext) && ALLOWED_MIME_TYPES.has(mime)) {
+    cb(null, true);
+  } else {
+    cb(
+      ApiError.badRequest(
+        `Invalid file format '${file.mimetype}'. Only JPG, JPEG, PNG, WEBP, and PDF files under 2MB are permitted.`
+      ),
+      false
+    );
+  }
 }
 
-// 1. General disk storage
-const generalStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, rootUploadDir);
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-    cb(null, `${uuidv4()}${ext}`);
-  },
-});
+/**
+ * Factory creating multer uploader for a designated folder under uploads/<type>/.
+ * Uses random UUID filenames and enforces 2MB limit.
+ *
+ * @param {string} type - Upload sub-folder name
+ * @returns {multer.Multer}
+ */
+export function createUploadMiddleware(type = "general") {
+  const targetDir = path.resolve(rootUploadDir, type);
+  if (!fs.existsSync(targetDir)) {
+    fs.mkdirSync(targetDir, { recursive: true });
+  }
 
-export const upload = multer({
-  storage: generalStorage,
-  limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB max
-  },
-  fileFilter: (req, file, cb) => {
-    const allowed = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
-    if (allowed.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(ApiError.badRequest(`Unsupported file format: ${file.mimetype}`), false);
-    }
-  },
-});
+  const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, targetDir);
+    },
+    filename: (req, file, cb) => {
+      const ext = path.extname(file.originalname).toLowerCase();
+      cb(null, `${type}-${uuidv4()}${ext}`);
+    },
+  });
 
-// 2. CSV Bulk Import Storage (in-memory buffer, max 2MB)
+  return multer({
+    storage,
+    limits: {
+      fileSize: 2 * 1024 * 1024, // 2MB max
+    },
+    fileFilter,
+  });
+}
+
+// Specific upload middlewares
+export const uploadStudentPhoto = createUploadMiddleware("students");
+export const uploadLogo = createUploadMiddleware("logos");
+export const uploadDocument = createUploadMiddleware("documents");
+export const upload = createUploadMiddleware("general");
+
+// CSV Bulk Import Storage (in-memory buffer, max 2MB)
 export const uploadCsv = multer({
   storage: multer.memoryStorage(),
   limits: {
@@ -64,65 +106,7 @@ export const uploadCsv = multer({
     if (isCsvMime || hasCsvExt) {
       cb(null, true);
     } else {
-      cb(ApiError.badRequest("Invalid file type. Please upload a valid CSV file."), false);
-    }
-  },
-});
-
-// 3. Student Photo Upload Storage (disk storage in uploads/students, max 2MB, JPG or PNG)
-const studentPhotoStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, studentPhotoDir);
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-    cb(null, `student-${uuidv4()}${ext}`);
-  },
-});
-
-export const uploadStudentPhoto = multer({
-  storage: studentPhotoStorage,
-  limits: {
-    fileSize: 2 * 1024 * 1024, // 2MB max
-  },
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
-    if (allowedTypes.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(
-        ApiError.badRequest("Only JPG and PNG images are allowed for student photos (max 2MB)."),
-        false
-      );
-    }
-  },
-});
-
-// 4. Academy Logo Storage (disk storage in uploads/logos, max 1MB, JPG or PNG)
-const logoStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, logoUploadDir);
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-    cb(null, `logo-${uuidv4()}${ext}`);
-  },
-});
-
-export const uploadLogo = multer({
-  storage: logoStorage,
-  limits: {
-    fileSize: 1 * 1024 * 1024, // 1MB max
-  },
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
-    if (allowedTypes.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(
-        ApiError.badRequest("Only JPG and PNG images are allowed for academy logo (max 1MB)."),
-        false
-      );
+      cb(ApiError.badRequest("Invalid file type. Please upload a valid CSV file (max 2MB)."), false);
     }
   },
 });

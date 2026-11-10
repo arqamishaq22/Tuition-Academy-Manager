@@ -1388,7 +1388,7 @@ export async function updateFeeStructure(academyId, userId, { updates, applyToAc
  * @returns {Promise<{ updatedCount: number }>}
  */
 export async function markOverdueAndApplyLateFees(academyId = null) {
-  return await withTransaction(async (conn) => {
+  const result = await withTransaction(async (conn) => {
     // 1. Add late fee to overdue invoices for academies that have late fee enabled
     let lateFeeSql = `
       UPDATE fees f

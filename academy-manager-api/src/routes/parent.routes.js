@@ -75,3 +75,4 @@ router.post(
 router.get("/academy-contact", parentController.getAcademyContact);
 
 export default router;
+

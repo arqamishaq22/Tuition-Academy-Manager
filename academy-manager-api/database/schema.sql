@@ -471,6 +471,7 @@ CREATE TABLE reminder_logs (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   academy_id BIGINT UNSIGNED NOT NULL,
   student_id BIGINT UNSIGNED NOT NULL,
+  recipient_phone VARCHAR(30) NULL,
   fee_id BIGINT UNSIGNED NULL,
   channel ENUM('whatsapp', 'sms', 'email') NOT NULL DEFAULT 'whatsapp',
   message TEXT NOT NULL,

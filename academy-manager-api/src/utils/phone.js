@@ -46,8 +46,22 @@ export function formatPakistaniPhone(phone) {
   return phone;
 }
 
+/**
+ * Formats 03001234567 to international WhatsApp format: 923001234567
+ * @param {string} phone
+ * @returns {string}
+ */
+export function toInternationalPakistaniPhone(phone) {
+  const norm = normalizePakistaniPhone(phone);
+  if (norm.startsWith("03") && norm.length === 11) {
+    return `92${norm.slice(1)}`;
+  }
+  return norm.replace(/[^0-9]/g, "");
+}
+
 export default {
   normalizePakistaniPhone,
+  toInternationalPakistaniPhone,
   isValidPakistaniPhone,
   formatPakistaniPhone,
 };

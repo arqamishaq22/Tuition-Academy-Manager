@@ -248,16 +248,20 @@ async function runTests() {
     // -------------------------------------------------------------
     console.log("\n[9] Testing Multi-Month Payment Allocation (Oldest Unpaid First)...");
 
-    // Create 2 consecutive unpaid months for student 1: 10/2099 (PKR 1000) and 11/2099 (PKR 1000)
-    await query(`DELETE FROM fees WHERE student_id = :studentId AND month IN (10, 11) AND year = 2099`, {
+    // Create 2 consecutive unpaid months for student 1: 10/2020 (PKR 1000) and 11/2020 (PKR 1000)
+    // Using 2020 ensures these are the oldest unpaid fees for the student
+    await query(`DELETE FROM payments WHERE fee_id IN (SELECT id FROM fees WHERE student_id = :studentId AND year = 2020)`, {
+      studentId: targetFee.studentId,
+    });
+    await query(`DELETE FROM fees WHERE student_id = :studentId AND month IN (10, 11) AND year = 2020`, {
       studentId: targetFee.studentId,
     });
 
     await query(
       `INSERT INTO fees (academy_id, student_id, month, year, amount, paid_amount, due_date, status, late_fee)
        VALUES 
-       (1, :studentId, 10, 2099, 1000, 0, '2099-10-10', 'pending', 0),
-       (1, :studentId, 11, 2099, 1000, 0, '2099-11-10', 'pending', 0)`,
+       (1, :studentId, 10, 2020, 1000, 0, '2020-10-10', 'pending', 0),
+       (1, :studentId, 11, 2020, 1000, 0, '2020-11-10', 'pending', 0)`,
       { studentId: targetFee.studentId }
     );
 
@@ -282,10 +286,10 @@ async function runTests() {
     }
 
     // Clean up temporary multi-month records
-    await query(`DELETE FROM payments WHERE fee_id IN (SELECT id FROM fees WHERE student_id = :studentId AND month IN (10, 11) AND year = 2099)`, {
+    await query(`DELETE FROM payments WHERE fee_id IN (SELECT id FROM fees WHERE student_id = :studentId AND month IN (10, 11) AND year = 2020)`, {
       studentId: targetFee.studentId,
     });
-    await query(`DELETE FROM fees WHERE student_id = :studentId AND month IN (10, 11) AND year = 2099`, {
+    await query(`DELETE FROM fees WHERE student_id = :studentId AND month IN (10, 11) AND year = 2020`, {
       studentId: targetFee.studentId,
     });
     console.log("    ✓ Multi-month payment successfully verified and cleaned up.");

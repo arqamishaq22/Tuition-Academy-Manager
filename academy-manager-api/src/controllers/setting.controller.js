@@ -30,8 +30,7 @@ export const uploadLogo = asyncHandler(async (req, res) => {
     throw ApiError.badRequest("Please select an image file to upload as the academy logo.");
   }
 
-  const logoUrl = `/uploads/logos/${req.file.filename}`;
-  const result = await settingService.updateLogo(req.user.academyId, logoUrl);
+  const result = await settingService.updateLogo(req.user.academyId, req.file);
   return sendSuccess(res, result);
 });
 
@@ -123,3 +122,4 @@ export default {
   deleteTeamMember,
   getPlan,
 };
+

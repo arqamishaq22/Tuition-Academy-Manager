@@ -64,3 +64,4 @@ export async function assertParentOwnsStudent(parentId, studentId, academyId) {
 export default {
   assertParentOwnsStudent,
 };
+

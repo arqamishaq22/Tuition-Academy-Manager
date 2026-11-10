@@ -14,7 +14,9 @@
     "test:concurrency": "node scripts/test-fees.js",
     "test:exams": "node tests/exam.test.js",
     "test:analytics": "node tests/dashboard_reports.test.js",
-    "test:portal": "node tests/parent_notices_settings.test.js"
+    "test:portal": "node tests/parent_notices_settings.test.js",
+    "test:reminders": "node tests/reminders_jobs_storage.test.js",
+    "test:all": "node tests/auth.test.js && node tests/modules.test.js && node tests/attendance.test.js && node tests/fee.test.js && node tests/exam.test.js && node tests/dashboard_reports.test.js && node tests/parent_notices_settings.test.js && node tests/reminders_jobs_storage.test.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

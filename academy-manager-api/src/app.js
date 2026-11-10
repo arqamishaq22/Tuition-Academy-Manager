@@ -73,9 +73,17 @@ const globalRateLimiter = rateLimit({
 app.use(globalRateLimiter);
 
 /**
- * 7.5. Serve Static Uploads (Student Photos, Slips)
+ * 7.5. Serve Static Uploads (Student Photos, Slips, Logos) with Safe Headers
  */
-app.use("/uploads", express.static("uploads"));
+app.use(
+  "/uploads",
+  (req, res, next) => {
+    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    next();
+  },
+  express.static("uploads")
+);
 
 /**
  * 8. Mount Main API Routes under /api/v1

@@ -35,3 +35,4 @@ router.delete("/:id", validate(getNoticeIdRouteSchema), noticeController.deleteN
 router.patch("/:id/pin", validate(pinNoticeRouteSchema), noticeController.togglePin);
 
 export default router;
+

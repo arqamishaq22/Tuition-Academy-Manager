@@ -95,3 +95,4 @@ export default {
   getNoticeIdRouteSchema,
   pinNoticeRouteSchema,
 };
+

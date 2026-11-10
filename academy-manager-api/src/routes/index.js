@@ -13,6 +13,8 @@ import reportRoutes from "./report.routes.js";
 import parentRoutes from "./parent.routes.js";
 import noticeRoutes from "./notice.routes.js";
 import settingRoutes from "./setting.routes.js";
+import reminderRoutes from "./reminder.routes.js";
+import adminRoutes from "./admin.routes.js";
 
 const router = Router();
 
@@ -53,6 +55,8 @@ router.use("/reports", reportRoutes);
 router.use("/parent", parentRoutes);
 router.use("/notices", noticeRoutes);
 router.use("/settings", settingRoutes);
+router.use("/reminders", reminderRoutes);
+router.use("/admin", adminRoutes);
 
 export default router;
 

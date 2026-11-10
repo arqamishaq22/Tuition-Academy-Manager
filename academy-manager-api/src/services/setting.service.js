@@ -4,6 +4,7 @@ import env from "../config/env.js";
 import ApiError from "../utils/ApiError.js";
 import { normalizePakistaniPhone, formatPakistaniPhone } from "../utils/phone.js";
 import logger from "../utils/logger.js";
+import storageService from "./storage.js";
 
 const PLAN_LIMITS = {
   free_pilot: 50,
@@ -140,19 +141,26 @@ export async function updateProfile(academyId, data) {
 
 /**
  * 3. POST /settings/logo
- * Updates academy logo URL.
+ * Updates academy logo URL, deleting previous logo if present.
  *
  * @param {number} academyId
- * @param {string} logoUrl
+ * @param {object} file
  * @returns {Promise<{ logoUrl: string }>}
  */
-export async function updateLogo(academyId, logoUrl) {
+export async function updateLogo(academyId, file) {
+  const current = await query(
+    `SELECT logo_url FROM academies WHERE id = :academyId LIMIT 1`,
+    { academyId }
+  );
+  const oldUrl = current[0]?.logo_url || null;
+  const saved = await storageService.replace(oldUrl, file, "logos");
+
   await query(
     `UPDATE academies SET logo_url = :logoUrl WHERE id = :academyId`,
-    { academyId, logoUrl }
+    { academyId, logoUrl: saved.url }
   );
 
-  return { logoUrl };
+  return { logoUrl: saved.url };
 }
 
 /**
@@ -564,3 +572,4 @@ export default {
   deleteTeamMember,
   getPlanDetails,
 };
+
