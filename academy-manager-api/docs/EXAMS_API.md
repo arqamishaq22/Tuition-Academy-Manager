@@ -478,3 +478,4 @@ Roll No,Student Name,Father Name,Mathematics (50),English (50),Total Marks,Obtai
   ```
   Returns `200 OK`:
   `"Exam and associated subjects deleted successfully."`
+
